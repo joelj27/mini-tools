@@ -1,23 +1,44 @@
 body {
-    background-color: rgba(252, 190, 115, 0.425);
+    background:
+        linear-gradient(rgba(241, 86, 216, 0.808), transparent),
+        linear-gradient(to top left, rgba(234, 236, 78, 0.822), transparent),
+        linear-gradient(to top right, rgb(8, 8, 54), transparent);
+        background-blend-mode: multiply;
+        background-size: 140em 140em;
   }
 h1{ 
     text-align: center;
     color: black;
-    font-size:50px;
+    font-size:70px;
     font-family: 'Courier New';
+ }
+.first{
+    
+    float: left;
+    padding: 2%;
+    margin-right: 30px;
+    margin-left: 30px;
+    margin-top: 40px;
+    font-size: 50px;
+    /* line-height: 200px;
+    vertical-align: middle; */
+    text-align: center; 
  }
 .icon{
     height:200px;
     width: 200px;
-    float: left;
-    padding: 10%;
-    margin-right: 30px;
-    margin-left: 30px;
-    margin-top: 40px;
-    font-size: 20px;
- }
+    background-color: rgba(134, 83, 141, 0);
+    color: black;
+    background-blend-mode: soft-light;
 
-.icon:focus{
-    color: rgba(240, 169, 142, 0.699);
-}
+ }
+.icon:hover{
+    color: rgb(0, 0, 0);
+    background-color: rgba(139, 74, 139, 0.438);
+ }
+h3{
+    color: rgb(44, 2, 44);
+    padding-bottom: 0%;
+    padding-top: 40px;
+    font-size: 25px;
+ }
