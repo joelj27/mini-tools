@@ -40,7 +40,7 @@ def load_camelcase():
 def camel_case_out():
     input_data=request.form["in_data"]
     output=get_camel_case(input_data)
-    return render_template("uppercase.html",input_data=output)
+    return render_template("camelcase.html",input_data=output)
 
 @app.route("/uppercase")
 def load_uppercase():
