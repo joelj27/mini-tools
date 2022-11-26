@@ -8,18 +8,18 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="../static/camelcase.css">
+        <link rel="stylesheet" href="../static/uppercase.css">
     </head>
     <body>
         <div class="title">
-            <p><h1>CAMEL-CASE</h1></p>
+            <p><h1>UPPER CASE</h1></p>
         </div>
         <div class="text_input">
-            <form action="/camelcase/camelcase_button" method="post" id="form1">
-                <textarea name="in_data" class="data1" id="" cols="30" rows="10"></textarea>
+            <form action="/uppercase/uppercase_button" method="post" id="form1">
+                <textarea name="in_data" class="data1" id="" cols="30" rows="10">{{input1}}</textarea>
             </form>
         <div class="text_input">
-            <textarea name="in_data" class="data1" id="" cols="30" rows="10"> {{input_data}}</textarea>
+            <textarea name="in_data" class="data1" id="" cols="30" rows="10"> {{output1}}</textarea>
         </div>
         <div class="bu1">
             <button type="submit" class="icon" form="form1" > Submit </BUtton>

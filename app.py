@@ -14,6 +14,14 @@ def get_word_count(data):
         length=len(data)
         return length
 
+def get_camel_case(data):
+    camel_case=data.title()
+    return camel_case
+
+def get_upper_case(data):
+    upper_case=data.upper()
+    return upper_case
+
 @app.route("/wordcount")
 def load_word_count():
     return render_template("word_count.html")
@@ -27,6 +35,22 @@ def get_input():
 @app.route("/camelcase")
 def load_camelcase():
     return render_template("camelcase.html")
+
+@app.route("/camelcase/camelcase_button", methods=['POST'])
+def camel_case_out():
+    input_data=request.form["in_data"]
+    output=get_camel_case(input_data)
+    return render_template("uppercase.html",input_data=output)
+
+@app.route("/uppercase")
+def load_uppercase():
+    return render_template("uppercase.html")
+
+@app.route("/uppercase/uppercase_button", methods=['POST'])
+def upper_case_out():
+    input_data=request.form["in_data"]
+    output=get_upper_case(input_data)
+    return render_template("uppercase.html",input1=input_data,output1=output)
 
 if __name__ =="__main__":
     app.run(debug=True)
