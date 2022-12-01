@@ -11,7 +11,7 @@ import gridfs
 
 app=Flask(__name__)
 app.config.from_object(configmodule.DevelopmentConfig)
-client = PyMongo(app)
+client = PyMongo(app, retryWrites=False)
 db=client.db
 
 path_update=[]
