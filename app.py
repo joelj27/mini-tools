@@ -4,11 +4,15 @@ import os
 from PIL import Image
 from queue import Queue
 import time
-
-
-
+from flask_pymongo import PyMongo
+import configmodule
+import io
+import gridfs
 
 app=Flask(__name__)
+app.config.from_object(configmodule.DevelopmentConfig)
+client = PyMongo(app)
+db=client.db
 
 path_update=[]
 @app.route("/")
@@ -39,6 +43,7 @@ def check_file():
         jsonify({"error":"no file provided"})
         jdata={"error":"no file provided"}
         return  jdata
+    global file
     file = request.files['file']
     if file.filename == "":
         jdata={"error":"file not provided"}
@@ -46,28 +51,22 @@ def check_file():
         return  jdata
     if file and allowed_extension(file.filename):
         filename=secure_filename(file.filename)
-        file.save(os.path.join(app.config["UPLOAD_FOLDER"],filename))
-        file_path=str(os.path.join(app.config["UPLOAD_FOLDER"],filename))
-        out=image_conveter(file_path)
-        jdata={"path":out}
-        return jdata
+        temp_file=file.read()
+        db.upload_images.insert_one({'File_name':filename, 'File': temp_file})
+        out=image_conveter(temp_file)
+        jdata={"path":filename}
+        return jdata, out
     else:
         jdata={"error":"file not suported"}
-        return  jdata
+        return  jdata,None
 
 def image_conveter(file_path):
-    if_image_folder_list=os.listdir("static\edited_images")
-    for i in if_image_folder_list:
-        os.remove("static\edited_images/"+i)
-    img=Image.open(file_path)
+    img=Image.open(io.BytesIO(file_path))
     img=img.convert("RGBA")
-    output_path=file_path.replace("static\images","static\edited_images").split(".")
-    output_path=output_path[0]+".png"
-    path_update.clear()
-    path_update.append(output_path)
-    img.save(output_path)
-    os.remove(file_path)
-    return output_path
+    buf = io.BytesIO()
+    img.save(buf,format("png"))
+    image=buf.getvalue()
+    return image
 
 @app.route("/wordcount")
 def load_word_count():
@@ -77,6 +76,8 @@ def load_word_count():
 def get_input():
     input_data=request.form["in_data"]
     output=get_word_count(input_data)
+    print(db.name)
+    db.word_count.insert_one({'Input':input_data, 'Word Count': output})
     return render_template("word_count.html",input_data=output)
 
 @app.route("/camelcase")
@@ -87,6 +88,7 @@ def load_camelcase():
 def camel_case_out():
     input_data=request.form["in_data"]
     output=get_camel_case(input_data)
+    db.camel_case.insert_one({'Input':input_data, 'Output': output})
     return render_template("camelcase.html",input_data=output)
 
 @app.route("/uppercase")
@@ -97,6 +99,7 @@ def load_uppercase():
 def upper_case_out():
     input_data=request.form["in_data"]
     output=get_upper_case(input_data)
+    db.upper_case.insert_one({'Input':input_data, 'Output': output})
     return render_template("uppercase.html",input1=input_data,output1=output)
 
 @app.route("/imageconveter")
@@ -105,7 +108,8 @@ def load_imageconveter():
 
 @app.route("/imageconveter/imageconveter_button", methods=['POST'])
 def updoad_image():
-    response=check_file()
+    global out_file
+    response,out_file=check_file()
     if "path" in str(response):
         return  render_template("imageconveter.html",jdata=response["path"])
     else:
@@ -115,10 +119,8 @@ def updoad_image():
 @app.route("/imageconveter/imageconveter_button/download",  methods=['POST'])
 def download():
     try:
-        global path
-        path = path_update[0]
-        file_name=path.split("\\")[-1]
-        return send_file(path,file_name,as_attachment=True)
+        file_name=file.filename.split(".")[0]+".png"
+        return send_file(io.BytesIO(out_file),mimetype="image/png",download_name=file_name,as_attachment=True)
     except Exception as e:
         return str(e)
 
@@ -126,4 +128,4 @@ def download():
 
 if __name__ =="__main__":
     app.run()
-    app.config.from_object(config.Config)
+    
