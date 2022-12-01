@@ -42,13 +42,13 @@ def check_file():
     if "file" not in request.files:
         jsonify({"error":"no file provided"})
         jdata={"error":"no file provided"}
-        return  jdata
+        return  jdata,None
     global file
     file = request.files['file']
     if file.filename == "":
         jdata={"error":"file not provided"}
         jsonify({"error":"file not provided"})
-        return  jdata
+        return  jdata,None
     if file and allowed_extension(file.filename):
         filename=secure_filename(file.filename)
         temp_file=file.read()
@@ -76,7 +76,6 @@ def load_word_count():
 def get_input():
     input_data=request.form["in_data"]
     output=get_word_count(input_data)
-    print(db.name)
     db.word_count.insert_one({'Input':input_data, 'Word Count': output})
     return render_template("word_count.html",input_data=output)
 
