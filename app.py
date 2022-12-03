@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,jsonify,send_file,after_this_request
+from flask import Flask,render_template,request,jsonify,send_file,after_this_request,make_response
 from werkzeug.utils import secure_filename
 import os
 from PIL import Image
@@ -39,10 +39,6 @@ def allowed_extension(filename):
     return "." in filename and filename.rsplit(".",1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
 
 def check_file():
-    if "file" not in request.files:
-        jsonify({"error":"no file provided"})
-        jdata={"error":"no file provided"}
-        return  jdata,None
     global file
     file = request.files['file']
     if file.filename == "":
@@ -54,19 +50,37 @@ def check_file():
         temp_file=file.read()
         db.upload_images.insert_one({'File_name':filename, 'File': temp_file})
         out=image_conveter(temp_file)
-        jdata={"path":filename}
+        jdata={"path":filename,"data":"None"}
         return jdata, out
     else:
         jdata={"error":"file not suported"}
         return  jdata,None
 
 def image_conveter(file_path):
-    img=Image.open(io.BytesIO(file_path))
-    img=img.convert("RGBA")
-    buf = io.BytesIO()
-    img.save(buf,format("png"))
-    image=buf.getvalue()
-    return image
+    if output_data_type["data"] == ".png":
+        img=Image.open(io.BytesIO(file_path))
+        img=img.convert("RGBA")
+        buf = io.BytesIO()
+        img.save(buf,format(output_data_type["data"].replace(".","").upper()))
+        image=buf.getvalue()
+        return image
+    elif output_data_type["data"] == ".jpg":
+        img=Image.open(io.BytesIO(file_path))
+        img=img.convert("RGB")
+        buf = io.BytesIO()
+        extension=output_data_type["data"].replace(".","").upper()
+        img.save(buf,format("JPEG"))
+        image=buf.getvalue()
+        return image
+    elif output_data_type["data"] == ".jpeg":
+        img=Image.open(io.BytesIO(file_path))
+        img=img.convert("RGB")
+        buf = io.BytesIO()
+        extension=output_data_type["data"].replace(".","").upper()
+        img.save(buf,format("JPEG"))
+        image=buf.getvalue()
+        return image
+
 
 @app.route("/wordcount")
 def load_word_count():
@@ -105,24 +119,29 @@ def upper_case_out():
 def load_imageconveter():
     return render_template("imageconveter.html",jdata=None)
 
-@app.route("/imageconveter/imageconveter_button", methods=['POST'])
+@app.route("/imageconveter", methods=['POST'])
 def updoad_image():
     global out_file
     response,out_file=check_file()
-    if "path" in str(response):
-        return  render_template("imageconveter.html",jdata=response["path"])
+    if "path" in str(response) and "error" not in str(response):
+        try:
+            file_name=file.filename.split(".")[0]+output_data_type["data"]
+            return render_template("imageconveter.html",jdata=response["data"]) and send_file(io.BytesIO(out_file),mimetype="image/*",download_name=file_name,as_attachment=True)
+        except Exception as e:
+            return str(e)
     else:
         jsonify({"data":response})
         return  render_template("imageconveter.html",jdata=response["error"])
+    
+@app.route("/getfile/format", methods=['POST'])  
+def get_file_type():
+    global output_data_type
+    output_data_type = request.get_json()
+    print(output_data_type)
+    return output_data_type
 
-@app.route("/imageconveter/imageconveter_button/download",  methods=['POST'])
-def download():
-    try:
-        file_name=file.filename.split(".")[0]+".png"
-        return send_file(io.BytesIO(out_file),mimetype="image/png",download_name=file_name,as_attachment=True)
-    except Exception as e:
-        return str(e)
 
+    
     
 
 if __name__ =="__main__":

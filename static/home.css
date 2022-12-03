@@ -1,10 +1,4 @@
 body {
-    /* background:
-        linear-gradient(rgba(241, 86, 216, 0.808), transparent),
-        linear-gradient(to top left, rgba(234, 236, 78, 0.822), transparent),
-        linear-gradient(to top right, rgb(8, 8, 54), transparent);
-        background-blend-mode: multiply;
-        background-size: 140em 140em; */
     height: 100vh;
     width: 100%;
     background-image: linear-gradient(45deg, rgb(8, 8, 54), rgba(255,0,0,0) 90.71%),

@@ -2,7 +2,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     UPLOAD_FOLDER ="E:\study\word count\mini-tools\static\images"
-    ALLOWED_EXTENSIONS = set(["png","jpg"])
+    ALLOWED_EXTENSIONS = set(["png","jpg","jpeg"])
     MONGO_URI = "mongodb+srv://jebajoel77:gitHelina@wordcount.sz2to3x.mongodb.net/website"
 class ProductionConfig(Config):
     DATABASE_URI = 'mysql://user@localhost/foo'
